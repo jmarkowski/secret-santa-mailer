@@ -3,6 +3,7 @@ import argparse
 import config
 import random
 import smtplib
+import validator
 
 
 def is_compatible(santas_lst):
@@ -56,6 +57,9 @@ def main():
 
     santas = config.santas
 
+    for s in santas:
+        validator.validate_email(s.email)
+
     # Clear contents of the file
     open(config.record_file, 'w').close()
 
@@ -72,6 +76,7 @@ def main():
 
     print('\nFinished!\n')
     print('Mail record saved to: {}'.format(config.record_file))
+
 
 if __name__ == '__main__':
     try:

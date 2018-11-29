@@ -76,7 +76,5 @@ contribute?)
 
 *  Make the configuration file a standard input file format such as an INI or
    JSON (i.e. Don't make it a python configuration file)
-*  Sanitization of the inputted configuration file (e.g. ensure emails are
-   properly formatted)
 *  Make it compatible with non-gmail accounts
 *  Allow the email configuration to be tested
