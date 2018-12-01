@@ -37,7 +37,7 @@ santas = [
     Santa('Erica',      'erica@someemail.com'),
     Santa('Luke',       'luke@someemail.com'),
     Santa('Sidney',     'sidney@someemail.com'),
-    Santa('Brittany',   'brittany@someemail.com')
+    Santa('Brittany',   'brittany@someemail.com'),
 ]
 
 ################################################################################
@@ -52,7 +52,7 @@ incompatibles = (
     ('Jan', 'Alisha'),
     ('Pam', 'Mark'),
     ('Nick', 'Erica'),
-    ('Luke', 'Sidney')
+    ('Luke', 'Sidney'),
 )
 
 ################################################################################
