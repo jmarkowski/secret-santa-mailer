@@ -1,7 +1,7 @@
 import re
 
 
-email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9]+$'
+email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
 
 
 class ValidateError(Exception):

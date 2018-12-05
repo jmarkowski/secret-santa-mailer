@@ -20,6 +20,10 @@ class TestValidator(unittest.TestCase):
         email = 'john.DOE+lab777@ABC-GO-NOW.AI'
         validator.validate_email(email)
 
+    def test_valid_tree_sufix(self):
+        email = 'valid@email.co.uk'
+        validator.validate_email(email)
+
     def test_invalid_basic(self):
         email = 'invalidemail.com'
         with self.assertRaises(validator.ValidateError):
