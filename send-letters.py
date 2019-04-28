@@ -2,7 +2,6 @@
 import argparse
 import config
 import random
-import smtplib
 import validator
 
 
