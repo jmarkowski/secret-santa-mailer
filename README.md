@@ -60,6 +60,12 @@ you must enable "less secure app" access for the account:
 2.  Go to [Gmail's Less Secure App Access](https://www.google.com/settings/security/lesssecureapps)
 3.  Set the "Allow less secure apps" option to ON.
 
+Send a test email to confirm that the script is able to send the email:
+
+```
+$ ./send-letters.py --test-email
+```
+
 
 ## 5. Send the emails!
 
@@ -81,6 +87,5 @@ Enjoy and have a Merry Christmas!
 # Wish List
 
 *  Make it compatible with non-gmail accounts.
-*  Allow the email configuration to be tested.
 *  Add support for allowing a recipient to have a gift "wish list" that may be
    added in an email.
