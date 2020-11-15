@@ -29,13 +29,13 @@ def is_compatible(santas_lst):
     return True
 
 
-def send_letter(santa, is_test):
-    letter = config.letter.text(santa, is_test)
+def send_letter(santa, dry_run):
+    letter = config.letter.text(santa, dry_run)
 
     with open(config.record_file, 'a') as f:
         f.write(letter)
 
-    if is_test:
+    if dry_run:
         print(letter, end='')
     else:
         config.letter.send(santa)
@@ -64,7 +64,7 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    is_test = True if not args.official else False
+    dry_run = not args.official
 
     santas = config.santas
 
@@ -83,7 +83,7 @@ def main():
     set_recipients(santas)
 
     for k in santas:
-        send_letter(k, is_test)
+        send_letter(k, dry_run)
 
     print('\nFinished!\n')
     print('Mail record saved to: {}'.format(config.record_file))
