@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 import argparse
-import config
 import random
-import validator
+import re
+
+import config
+
+
+class SecretSantaError(Exception):
+    pass
+
+
+def validate_email(email):
+    email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
+
+    if not re.match(email_regex, email):
+        raise SecretSantaError('Invalid email: {}'.format(email))
 
 
 def is_compatible(santas_lst):
@@ -57,7 +69,7 @@ def main():
     santas = config.santas
 
     for s in santas:
-        validator.validate_email(s.email)
+        validate_email(s.email)
 
     # Clear contents of the file
     open(config.record_file, 'w').close()
