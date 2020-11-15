@@ -44,9 +44,9 @@ def send_letter(santa, is_test):
 def set_recipients(santas):
 
     for k in range(len(santas) - 1):
-        santas[k].set_recipient(santas[k+1])
+        santas[k].recipient = santas[k+1]
 
-    santas[-1].set_recipient(santas[0])
+    santas[-1].recipient = santas[0]
 
 
 def parse_arguments():
