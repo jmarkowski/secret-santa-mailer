@@ -66,4 +66,4 @@ incompatibles = (
 # This file will contain a record of what was emailed. It will reveal who is
 # everyone's secret santa.
 ################################################################################
-record_file = 'secret-santa-list.txt'
+record_file = 'secret-santa-email-record.txt'
