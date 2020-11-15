@@ -2,10 +2,12 @@ class Santa(object):
     def __init__(self, name, email):
         self.name = name
         self.email = email
-        self.recipient = None
 
-    def set_recipient(self, santa):
-        self.recipient = santa
+    @property
+    def recipient(self):
+        return self._recipient
 
-    def get_recipient(self):
-        return self.recipient
+    @recipient.setter
+    def recipient(self, recipient):
+        assert isinstance(recipient, Santa)
+        self._recipient = recipient

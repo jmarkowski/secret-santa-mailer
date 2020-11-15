@@ -13,7 +13,7 @@ class Letter(object):
         if test:
             text = '{:12} -> {}\n'.format(
                        santa.name,
-                       santa.get_recipient().name
+                       santa.recipient.name
                    )
         else:
             text = 'From: {} <{}>\n' \
@@ -30,7 +30,7 @@ class Letter(object):
                     )
 
             text = text.replace('{santa}', santa.name)
-            text = text.replace('{recipient}', santa.get_recipient().name)
+            text = text.replace('{recipient}', santa.recipient.name)
 
         return text
 
