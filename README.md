@@ -44,7 +44,8 @@ $ ./send-letters.py
 
 This will read the configuration file and perform a "dry run" of the various
 pairings between secret Santas and recipients. It will generate an output file
-as specified by the `record_file` setting in the configuration file.
+as specified by the `record_file` setting in the configuration file (by default
+it is `secret-santa-email-record.txt`.
 
 If it runs without any errors, then you're ready to send the secret Santa
 emails.
