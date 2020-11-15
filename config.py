@@ -29,15 +29,15 @@ letter = Letter(
 # The complete list of all the secret santa's and their email addresses.
 ################################################################################
 santas = [
-    Santa('Jan',        'jan@someemail.com'),
-    Santa('Alisha',     'alisha@someemail.com'),
-    Santa('Pam',        'pam@someemail.com'),
-    Santa('Mark',       'mark@someemail.com'),
-    Santa('Nick',       'nick@someemail.com'),
-    Santa('Erica',      'erica@someemail.com'),
-    Santa('Luke',       'luke@someemail.com'),
-    Santa('Sidney',     'sidney@someemail.com'),
-    Santa('Brittany',   'brittany@someemail.com'),
+    Santa('Jan',        'jan@example.com'),
+    Santa('Alisha',     'alisha@example.com'),
+    Santa('Pam',        'pam@example.com'),
+    Santa('Mark',       'mark@example.com'),
+    Santa('Nick',       'nick@example.com'),
+    Santa('Erica',      'erica@example.com'),
+    Santa('Luke',       'luke@example.com'),
+    Santa('Sidney',     'sidney@example.com'),
+    Santa('Brittany',   'brittany@example.com'),
 ]
 
 ################################################################################
