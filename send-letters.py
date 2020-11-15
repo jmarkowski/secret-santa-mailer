@@ -4,6 +4,7 @@ import random
 import re
 
 import config
+from santa import Santa
 
 
 class SecretSantaError(Exception):
@@ -59,14 +60,15 @@ def parse_arguments():
         action='store_true',
         help='Actually send email (and not dump to output)')
 
+    parser.add_argument('--test-email',
+        dest='test_email',
+        action='store_true',
+        help='Send a test email to check configuration')
+
     return parser.parse_args()
 
 
-def main():
-    args = parse_arguments()
-
-    dry_run = not args.official
-
+def secret_santa(args):
     santas = config.santas
 
     for s in santas:
@@ -83,11 +85,29 @@ def main():
 
     set_recipients(santas)
 
+    dry_run = not args.official
+
     for k in santas:
         send_letter(k, dry_run)
 
     print('\nFinished!\n')
     print('Mail record saved to: {}'.format(config.record_file))
+
+
+def send_test_email():
+    test_santa = Santa('Test Santa', config.smtp_user)
+    test_recipient = Santa('Test Recipient', 'test@example.com')
+    test_santa.recipient = test_recipient
+    config.letter.send(test_santa)
+
+
+def main():
+    args = parse_arguments()
+
+    if args.test_email:
+        send_test_email()
+    else:
+        secret_santa(args)
 
 
 if __name__ == '__main__':
