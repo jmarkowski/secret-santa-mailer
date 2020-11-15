@@ -3,11 +3,10 @@ from santa import Santa
 import smtplib
 
 class Letter(object):
-    def __init__(self, from_name, from_email, subject, greeting, body):
+    def __init__(self, from_name, from_email, subject, body):
         self.from_name = from_name
         self.from_email = from_email
         self.subject = subject
-        self.greeting = greeting
         self.body = body
 
     def text(self, santa, test=False):
@@ -21,14 +20,12 @@ class Letter(object):
                    'To: {} <{}>\n' \
                    'Subject: {}\n' \
                    '\n' \
-                   '{}\n' \
                    '{}\n'.format(
                         self.from_name,
                         self.from_email,
                         santa.name,
                         santa.email,
                         self.subject,
-                        self.greeting,
                         self.body
                     )
 
