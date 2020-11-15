@@ -21,8 +21,13 @@ letter = Letter(
     from_name='Secret Santa',
     from_email=smtp_user,
     subject='Family Christmas',
-    greeting="{santa}, you are {recipient}'s secret Santa!",
-    body=""
+    body="""
+Ho Ho Ho!
+
+{santa}, you are {recipient}'s secret Santa!
+
+Merry Christmas!
+"""
 )
 
 ################################################################################
