@@ -9,34 +9,21 @@ class Letter(object):
         self.subject = subject
         self.body = body
 
-    def text(self, santa, test=False):
-        if test:
-            text = '{:12} -> {}\n'.format(
-                       santa.name,
-                       santa.recipient.name
-                   )
-        else:
-            text = 'From: {} <{}>\n' \
-                   'To: {} <{}>\n' \
-                   'Subject: {}\n' \
-                   '\n' \
-                   '{}\n'.format(
-                        self.from_name,
-                        self.from_email,
-                        santa.name,
-                        santa.email,
-                        self.subject,
-                        self.body
-                    )
+    def get_email_message(self, santa):
+        message = \
+            f'From: {self.from_name} <{self.from_email}>\n' \
+            f'To: {santa.name} <{santa.email}>\n' \
+            f'Subject: {self.subject}\n\n' \
+            f'{self.body}\n'
 
-            text = text.replace('{santa}', santa.name)
-            text = text.replace('{recipient}', santa.recipient.name)
+        message = message.replace('{santa}', santa.name)
+        message = message.replace('{recipient}', santa.recipient.name)
 
-        return text
+        return message
 
     def send(self, santa):
 
-        message = self.text(santa)
+        message = self.get_email_message(santa)
 
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)

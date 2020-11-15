@@ -30,13 +30,14 @@ def is_compatible(santas_lst):
 
 
 def send_letter(santa, dry_run):
-    letter = config.letter.text(santa, dry_run)
+    message = config.letter.get_email_message(santa)
 
     with open(config.record_file, 'a') as f:
-        f.write(letter)
+        f.write(message)
+        f.write('*' * 80 + '\n')
 
     if dry_run:
-        print(letter, end='')
+        print('{:12} -> {}\n'.format(santa.name, santa.recipient.name), end='')
     else:
         config.letter.send(santa)
 
