@@ -1,6 +1,8 @@
+import smtplib
+
 import config
 from santa import Santa
-import smtplib
+
 
 class Letter(object):
     def __init__(self, from_name, from_email, subject, body):

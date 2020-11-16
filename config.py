@@ -1,5 +1,5 @@
-from santa import Santa
 from letter import Letter
+from santa import Santa
 
 ################################################################################
 # This is the email address that is going to be used to dispatch all the secret
