@@ -45,26 +45,28 @@ $ ./send-letters.py
 This will read the configuration file and perform a "dry run" of the various
 pairings between secret Santas and recipients. It will generate an output file
 as specified by the `record_file` setting in the configuration file (by default
-it is `secret-santa-email-record.txt`.
-
-If it runs without any errors, then you're ready to send the secret Santa
-emails.
+it is `secret-santa-email-record.txt`).
 
 
 ## 4. Enable Automatic Emailing
 
-In order to allow this script send emails using a Gmail account,
-you must enable "less secure app" access for the account:
+In order to allow this script to send emails using a Gmail account,
+you must enable "less secure app" access:
 
-1.  Log into the Gmail account that you'd like to use to send the emails.
-2.  Go to [Gmail's Less Secure App Access](https://www.google.com/settings/security/lesssecureapps)
-3.  Set the "Allow less secure apps" option to ON.
+1.  Log into the Gmail account that will be used to send the emails.
+2.  Go to Gmail's [Less Secure App Access](https://www.google.com/settings/security/lesssecureapps)
+3.  Set the *Allow less secure apps* option to ON.
 
-Send a test email to confirm that the script is able to send the email:
+Send a test email to confirm that the email configuration works:
 
 ```
 $ ./send-letters.py --test-email
 ```
+*Note: This will send a loopback email to the same account that's being used to
+send the email.*
+
+If it runs without any errors, then you're ready to send the secret Santa
+emails.
 
 
 ## 5. Send the emails!
