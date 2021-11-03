@@ -38,7 +38,7 @@ def send_letter(santa, dry_run):
         f.write('*' * 80 + '\n')
 
     if dry_run:
-        print('{:12} -> {}\n'.format(santa.name, santa.recipient.name), end='')
+        print(santa)
     else:
         config.letter.send(santa)
 
