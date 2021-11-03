@@ -87,7 +87,7 @@ def secret_santa(args):
 
     dry_run = not args.official
 
-    for k in santas:
+    for k in sorted(santas):
         send_letter(k, dry_run)
 
     print('\nFinished!\n')
