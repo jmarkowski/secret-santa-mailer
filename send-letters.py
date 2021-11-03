@@ -18,13 +18,15 @@ def validate_email(email):
         raise SecretSantaError('Invalid email: {}'.format(email))
 
 
-def is_compatible(santas_lst):
+def is_santa_list_compatible(santas_lst):
     for k in range(len(santas_lst)):
-        one = k % len(santas_lst)
-        two = (k + 1) % len(santas_lst)
+        a = k % len(santas_lst)
+        b = (k + 1) % len(santas_lst)
 
-        x, y = santas_lst[one].name, santas_lst[two].name
-        if tuple((x,y)) in config.incompatibles or tuple((y,x)) in config.incompatibles:
+        santa, recipient = santas_lst[a].name, santas_lst[b].name
+
+        if santa in config.incompatibles and \
+                recipient in config.incompatibles[santa]:
             return False
 
     return True
@@ -80,7 +82,7 @@ def secret_santa(args):
     while True:
         random.shuffle(santas)
 
-        if is_compatible(santas):
+        if is_santa_list_compatible(santas):
             break
 
     set_recipients(santas)

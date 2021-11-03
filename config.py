@@ -46,19 +46,16 @@ santas = [
 ]
 
 ################################################################################
-# This contains a list of people that you do NOT want to be paired together...
-# for whatever reason (either because they're going to gossip to each other of
-# who they have as their recipient, or they just plainly can't stand the thought
-# of giving each other a gift).
+# This contains a dictionary lookup of santa's (keys) who are not allowed to
+# have particular recipients (values).
 #
-# If there are no incompatibles, leave it empty.
+# If there are no incompatibles, leave this dictionary empty.
 ################################################################################
-incompatibles = (
-    ('Jan', 'Alisha'),
-    ('Pam', 'Mark'),
-    ('Nick', 'Erica'),
-    ('Luke', 'Sidney'),
-)
+incompatibles = {
+    'Jan': ('Alisha',), # Do not allow Jan to be santa for Alisha
+    'Alisha': ('Jan',), # Do not allow Alisha to be santa for Jan
+    'Pam': ('Mark', 'Alisha',), # Do not allow Pam to be santa for Mark or Alisha
+}
 
 ################################################################################
 # DON'T PEAK INTO THIS FILE!
