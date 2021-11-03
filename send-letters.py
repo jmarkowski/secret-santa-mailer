@@ -11,20 +11,15 @@ class SecretSantaError(Exception):
     pass
 
 
-def validate_email(email):
-    email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
-
-    if not re.match(email_regex, email):
-        raise SecretSantaError('Invalid email: {}'.format(email))
-
-
-def is_compatible(santas_lst):
+def is_santa_list_compatible(santas_lst):
     for k in range(len(santas_lst)):
-        one = k % len(santas_lst)
-        two = (k + 1) % len(santas_lst)
+        a = k % len(santas_lst)
+        b = (k + 1) % len(santas_lst)
 
-        x, y = santas_lst[one].name, santas_lst[two].name
-        if tuple((x,y)) in config.incompatibles or tuple((y,x)) in config.incompatibles:
+        santa, recipient = santas_lst[a].name, santas_lst[b].name
+
+        if santa in config.incompatibles and \
+                recipient in config.incompatibles[santa]:
             return False
 
     return True
@@ -38,7 +33,7 @@ def send_letter(santa, dry_run):
         f.write('*' * 80 + '\n')
 
     if dry_run:
-        print('{:12} -> {}\n'.format(santa.name, santa.recipient.name), end='')
+        print(santa)
     else:
         config.letter.send(santa)
 
@@ -68,11 +63,49 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def check_emails(santas):
+    email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
+
+    for santa in santas:
+        if not re.match(email_regex, santa.email):
+            raise SecretSantaError(
+                    f'{santa.name} has an invalid email: {santa.email}')
+
+
+def check_compatibilities(santas):
+    santa_names = tuple(map(lambda s: s.name, santas))
+
+    for name in config.incompatibles:
+        if name not in santa_names:
+            raise SecretSantaError(
+                    f'Unknown santa in incompatible list: {name}. ' \
+                     'Please check spelling')
+
+        for incompatible_recipient in config.incompatibles[name]:
+            if incompatible_recipient not in santa_names:
+                raise SecretSantaError(
+                        f'Unknown incompatible recipient for {name}: ' \
+                        f'{incompatible_recipient}. Please check spelling.')
+
+
+        if not isinstance(config.incompatibles[name], tuple):
+            raise SecretSantaError(
+                    f'The incompatible list for {name} must be a tuple')
+
+        num_incompatible_recipients = len(config.incompatibles[name])
+        num_possible_recipients = len(santas) - 1 - num_incompatible_recipients
+
+        if num_possible_recipients == 0:
+            raise SecretSantaError(
+                    f'{name} has no option for a recipient! Check the ' \
+                    '\'incompatibles\' list in the configuration file.')
+
+
 def secret_santa(args):
     santas = config.santas
 
-    for s in santas:
-        validate_email(s.email)
+    check_emails(santas)
+    check_compatibilities(santas)
 
     # Clear contents of the file
     open(config.record_file, 'w').close()
@@ -80,14 +113,14 @@ def secret_santa(args):
     while True:
         random.shuffle(santas)
 
-        if is_compatible(santas):
+        if is_santa_list_compatible(santas):
             break
 
     set_recipients(santas)
 
     dry_run = not args.official
 
-    for k in santas:
+    for k in sorted(santas):
         send_letter(k, dry_run)
 
     print('\nFinished!\n')
