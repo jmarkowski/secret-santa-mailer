@@ -55,6 +55,8 @@ incompatibles = {
     'Jan': ('Alisha',), # Do not allow Jan to be santa for Alisha
     'Alisha': ('Jan',), # Do not allow Alisha to be santa for Jan
     'Pam': ('Mark', 'Alisha',), # Do not allow Pam to be santa for Mark or Alisha
+# The following is bad, Brittany can't be a secret santa for anyone!
+#   'Brittany': ('Jan', 'Alisha', 'Pam', 'Mark', 'Nick', 'Erica', 'Luke', 'Sidney'),
 }
 
 ################################################################################

@@ -11,13 +11,6 @@ class SecretSantaError(Exception):
     pass
 
 
-def validate_email(email):
-    email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
-
-    if not re.match(email_regex, email):
-        raise SecretSantaError('Invalid email: {}'.format(email))
-
-
 def is_santa_list_compatible(santas_lst):
     for k in range(len(santas_lst)):
         a = k % len(santas_lst)
@@ -70,11 +63,49 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def check_emails(santas):
+    email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
+
+    for santa in santas:
+        if not re.match(email_regex, santa.email):
+            raise SecretSantaError(
+                    f'{santa.name} has an invalid email: {santa.email}')
+
+
+def check_compatibilities(santas):
+    santa_names = tuple(map(lambda s: s.name, santas))
+
+    for name in config.incompatibles:
+        if name not in santa_names:
+            raise SecretSantaError(
+                    f'Unknown santa in incompatible list: {name}. ' \
+                     'Please check spelling')
+
+        for incompatible_recipient in config.incompatibles[name]:
+            if incompatible_recipient not in santa_names:
+                raise SecretSantaError(
+                        f'Unknown incompatible recipient for {name}: ' \
+                        f'{incompatible_recipient}. Please check spelling.')
+
+
+        if not isinstance(config.incompatibles[name], tuple):
+            raise SecretSantaError(
+                    f'The incompatible list for {name} must be a tuple')
+
+        num_incompatible_recipients = len(config.incompatibles[name])
+        num_possible_recipients = len(santas) - 1 - num_incompatible_recipients
+
+        if num_possible_recipients == 0:
+            raise SecretSantaError(
+                    f'{name} has no option for a recipient! Check the ' \
+                    '\'incompatibles\' list in the configuration file.')
+
+
 def secret_santa(args):
     santas = config.santas
 
-    for s in santas:
-        validate_email(s.email)
+    check_emails(santas)
+    check_compatibilities(santas)
 
     # Clear contents of the file
     open(config.record_file, 'w').close()
