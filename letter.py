@@ -31,7 +31,7 @@ class Letter(object):
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
             server.ehlo()
             server.login(config.smtp_user, config.smtp_pass)
-            server.sendmail(self.from_email, [santa.email], message)
+            server.sendmail(self.from_email, [santa.email], message.encode('utf-8'))
             server.close()
 
             print('Successfully mailed letter to {}!'.format(santa.name))
