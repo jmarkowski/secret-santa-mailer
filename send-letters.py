@@ -32,9 +32,7 @@ def send_letter(santa, dry_run):
         f.write(message)
         f.write('*' * 80 + '\n')
 
-    if dry_run:
-        print(santa)
-    else:
+    if not dry_run:
         config.letter.send(santa)
 
 
@@ -53,12 +51,13 @@ def parse_arguments():
     parser.add_argument('--official',
         dest='official',
         action='store_true',
-        help='Actually send email (and not dump to output)')
+        help='Actually send the secret santa emails (for real!)')
 
-    parser.add_argument('--test-email',
+    parser.add_argument('--send-test-email',
         dest='test_email',
         action='store_true',
-        help='Send a test email to check configuration')
+        help='Send a test email to verify SMTP settings ' \
+                'are correctly configured')
 
     return parser.parse_args()
 
@@ -101,7 +100,7 @@ def check_compatibilities(santas):
                     '\'incompatibles\' list in the configuration file.')
 
 
-def secret_santa(args):
+def send_secret_santa_emails(args):
     santas = config.santas
 
     check_emails(santas)
@@ -120,11 +119,15 @@ def secret_santa(args):
 
     dry_run = not args.official
 
+    if dry_run:
+        print('>>> TESTING: Performing a sample dry-run ...')
+    else:
+        print('>>> Officially sending all secret santa emails ...\n')
+
     for k in sorted(santas):
         send_letter(k, dry_run)
 
-    print('\nFinished!\n')
-    print('Mail record saved to: {}'.format(config.record_file))
+    print('\nMail record saved to: {}'.format(config.record_file))
 
 
 def send_test_email():
@@ -140,7 +143,7 @@ def main():
     if args.test_email:
         send_test_email()
     else:
-        secret_santa(args)
+        send_secret_santa_emails(args)
 
 
 if __name__ == '__main__':

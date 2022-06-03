@@ -34,15 +34,14 @@ Merry Christmas!
 # The complete list of all the secret santa's and their email addresses.
 ################################################################################
 santas = [
-    Santa('Jan',        'jan@example.com'),
-    Santa('Alisha',     'alisha@example.com'),
-    Santa('Pam',        'pam@example.com'),
-    Santa('Mark',       'mark@example.com'),
-    Santa('Nick',       'nick@example.com'),
-    Santa('Erica',      'erica@example.com'),
-    Santa('Luke',       'luke@example.com'),
-    Santa('Sidney',     'sidney@example.com'),
-    Santa('Brittany',   'brittany@example.com'),
+    Santa('James',      'james@example.com'),
+    Santa('Mary',       'mary@example.com'),
+    Santa('Nancy',      'nancy@example.com'),
+    Santa('John',       'john@example.com'),
+    Santa('Michael',    'michael@example.com'),
+    Santa('Lisa',       'lisa@example.com'),
+    Santa('David',      'david@example.com'),
+    Santa('Linda',      'linda@example.com'),
 ]
 
 ################################################################################
@@ -52,11 +51,17 @@ santas = [
 # If there are no incompatibles, leave this dictionary empty.
 ################################################################################
 incompatibles = {
-    'Jan': ('Alisha',), # Do not allow Jan to be santa for Alisha
-    'Alisha': ('Jan',), # Do not allow Alisha to be santa for Jan
-    'Pam': ('Mark', 'Alisha',), # Do not allow Pam to be santa for Mark or Alisha
-# The following is bad, Brittany can't be a secret santa for anyone!
-#   'Brittany': ('Jan', 'Alisha', 'Pam', 'Mark', 'Nick', 'Erica', 'Luke', 'Sidney'),
+    # Do not allow James to be santa for Mary
+    'James': ('Mary',),
+
+    # Do not allow Mary to be santa for James
+    'Mary': ('James',),
+
+    # Do not allow Nancy to be santa for John or Mary
+    'Nancy': ('John', 'Mary',),
+
+    # Something like below is bad, Linda can't be a secret santa for anyone!
+#   'Linda': ('James', 'Mary', 'Nancy', 'John', 'Michael', 'Lisa', 'David'),
 }
 
 ################################################################################

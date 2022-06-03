@@ -4,7 +4,7 @@ This secret santa script will automatically "pull from a hat" a recipient for
 each secret santa and send a notification email to each santa's inbox
 of who their gift recipient is.
 
-It ensures that no one knows who their secret santa is... not even *you*! (That
+It ensures that no one knows who their secret santa is... **not even you**! (That
 is, unless you really want to know).
 
 
@@ -32,8 +32,8 @@ Make your desired modifications to the `config.py` configuration file.
 In it, you specify:
 
 *  The list of secret santas.
-*  The template of the letter that will be emailed.
-*  Optionally a list of people that should *not* be paired for secret santa.
+*  The email template.
+*  Optionally a lookup of anyone who should not be someone elses santa.
 
 
 ## 3. Test the Script
@@ -60,7 +60,7 @@ you must enable "less secure app" access:
 Send a test email to confirm that the email configuration works:
 
 ```
-$ ./send-letters.py --test-email
+$ ./send-letters.py --send-test-email
 ```
 *Note: This will send a loopback email to the same account that's being used to
 send the email.*
