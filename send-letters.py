@@ -62,11 +62,15 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def check_emails(santas):
+def is_email_valid(email):
     email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
 
+    return re.match(email_regex, email)
+
+
+def check_emails(santas):
     for santa in santas:
-        if not re.match(email_regex, santa.email):
+        if not is_email_valid(santa.email):
             raise SecretSantaError(
                     f'{santa.name} has an invalid email: {santa.email}')
 
