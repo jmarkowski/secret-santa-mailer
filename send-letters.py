@@ -55,10 +55,11 @@ def parse_arguments():
         action='store_true',
         help='Actually send email (and not dump to output)')
 
-    parser.add_argument('--test-email',
+    parser.add_argument('--send-test-email',
         dest='test_email',
         action='store_true',
-        help='Send a test email to check configuration')
+        help='Send a test email to verify SMTP settings ' \
+                'are correctly configured')
 
     return parser.parse_args()
 

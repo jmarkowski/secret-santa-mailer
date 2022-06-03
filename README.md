@@ -60,7 +60,7 @@ you must enable "less secure app" access:
 Send a test email to confirm that the email configuration works:
 
 ```
-$ ./send-letters.py --test-email
+$ ./send-letters.py --send-test-email
 ```
 *Note: This will send a loopback email to the same account that's being used to
 send the email.*
