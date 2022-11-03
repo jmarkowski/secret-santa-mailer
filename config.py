@@ -11,6 +11,8 @@ from santa import Santa
 ################################################################################
 smtp_user = 'the_email_used_to_send_letters@gmail.com'
 smtp_pass = 'password'
+smtp_host = 'smtp.gmail.com'
+smtp_port = 465
 
 ################################################################################
 # This the secret santa letter template that is used to send everyone the email.

@@ -88,6 +88,5 @@ Enjoy and have a Merry Christmas!
 
 # Wish List
 
-*  Make it compatible with non-gmail accounts.
 *  Add support for allowing a recipient to have a gift "wish list" that may be
    added in an email.
