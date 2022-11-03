@@ -2,17 +2,13 @@ from letter import Letter
 from santa import Santa
 
 ################################################################################
-# This is the email address that is going to be used to dispatch all the secret
-# santa letters.
-#
-# WARNING: These emails will appear in the "Sent" folder of the email... So be
-# careful to either (a) not look in your sent folder, or (b) use an email that
-# you're not planning to login with.
+# SMTP configuration settings.
 ################################################################################
-smtp_user = 'the_email_used_to_send_letters@gmail.com'
+smtp_user = 'username'
 smtp_pass = 'password'
-smtp_host = 'smtp.gmail.com'
-smtp_port = 465
+smtp_host = 'email-smtp.example.com'
+smtp_port = 587
+from_email = 'email-used-to-send-letters@example.com'
 
 ################################################################################
 # This the secret santa letter template that is used to send everyone the email.
@@ -21,7 +17,7 @@ smtp_port = 465
 ################################################################################
 letter = Letter(
     from_name='Secret Santa',
-    from_email=smtp_user,
+    from_email=from_email,
     subject='Family Christmas',
     body="""
 Ho Ho Ho!
