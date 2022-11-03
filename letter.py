@@ -28,8 +28,8 @@ class Letter(object):
         message = self.get_email_message(santa)
 
         try:
-            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-            server.ehlo()
+            server = smtplib.SMTP(config.smtp_host, config.smtp_port)
+            server.starttls()
             server.login(config.smtp_user, config.smtp_pass)
             server.sendmail(self.from_email, [santa.email], message.encode('utf-8'))
             server.close()

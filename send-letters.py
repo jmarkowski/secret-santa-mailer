@@ -54,9 +54,9 @@ def parse_arguments():
         help='Actually send the secret santa emails (for real!)')
 
     parser.add_argument('--send-test-email',
-        dest='test_email',
-        action='store_true',
-        help='Send a test email to verify SMTP settings ' \
+        dest='email',
+        type=str,
+        help='Send a test email to EMAIL to check if SMTP settings ' \
                 'are correctly configured')
 
     return parser.parse_args()
@@ -134,18 +134,17 @@ def send_secret_santa_emails(args):
     print('\nMail record saved to: {}'.format(config.record_file))
 
 
-def send_test_email():
-    test_santa = Santa('Test Santa', config.smtp_user)
-    test_recipient = Santa('Test Recipient', 'test@example.com')
-    test_santa.recipient = test_recipient
+def send_test_email(to_email):
+    test_santa = Santa('Test Santa', to_email)
+    test_santa.recipient = Santa('Test Recipient', None)
     config.letter.send(test_santa)
 
 
 def main():
     args = parse_arguments()
 
-    if args.test_email:
-        send_test_email()
+    if args.email:
+        send_test_email(args.email)
     else:
         send_secret_santa_emails(args)
 
