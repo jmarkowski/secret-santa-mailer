@@ -31,7 +31,7 @@ Make your desired modifications to the `config.py` configuration file.
 
 In it, you must specify:
 
-*  The SMTP configuration and credentials.
+*  The SMTP settings.
 *  The list of secret santas.
 *  An email template.
 *  Optionally a lookup of anyone who should not be someone elses santa.
@@ -49,10 +49,10 @@ as specified by the `record_file` setting in `config.py` (by default
 it is `secret-santa-email-record.txt`).
 
 
-## 4. Obtaining SMTP credentials.
+## 4. Configure the SMTP settings
 
 This script relies on a simple SMTP method of sending emails, and the SMTP
-configuration in `config.py` will depend on your preferred service to use.
+settings in `config.py` will depend on your preferred service to use.
 
 One cheap option would be to use [Amazon SES](https://aws.amazon.com/ses/), with
 instructions on how to obtain credentials
@@ -62,7 +62,7 @@ If you know of other, better, simpler ways, feel free to add them here with a
 pull request.
 
 
-## 5. Test SMTP configuration
+### Test Your SMTP configuration
 
 Send a test email to confirm that the SMTP configuration is set up correctly:
 
@@ -74,7 +74,7 @@ If it runs without any errors, then you're ready to send the secret Santa
 emails.
 
 
-## 6. Send the emails!
+## 5. Send the emails!
 
 ```
 $ ./send-letters.py --official
