@@ -57,19 +57,20 @@ you must enable "less secure app" access:
 2.  Go to Gmail's [Less Secure App Access](https://www.google.com/settings/security/lesssecureapps)
 3.  Set the *Allow less secure apps* option to ON.
 
-Send a test email to confirm that the email configuration works:
+
+## 5. Test SMTP configuration
+
+Send a test email to confirm that the SMTP configuration is set up correctly:
 
 ```
-$ ./send-letters.py --send-test-email
+$ ./send-letters.py --send-test-email you@example.com
 ```
-*Note: This will send a loopback email to the same account that's being used to
-send the email.*
 
 If it runs without any errors, then you're ready to send the secret Santa
 emails.
 
 
-## 5. Send the emails!
+## 6. Send the emails!
 
 ```
 $ ./send-letters.py --official
