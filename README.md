@@ -10,11 +10,8 @@ is, unless you really want to know).
 
 # Requirements
 
-*  Python3
-*  Gmail mail account (used to send the email notifications)
-
-*NOTE: Currently, the script and these instructions only support working with a
-Gmail account.*
+*  Python
+*  SMTP server used to automatically send emails
 
 
 # Instructions
@@ -31,7 +28,7 @@ Make your desired modifications to the `config.py` configuration file.
 
 In it, you must specify:
 
-*  The SMTP settings.
+*  The SMTP settings as specified by your SMTP host.
 *  The list of secret santas.
 *  An email template.
 *  Optionally a lookup of anyone who should not be someone elses santa.
@@ -54,12 +51,12 @@ it is `secret-santa-email-record.txt`).
 This script relies on a simple SMTP method of sending emails, and the SMTP
 settings in `config.py` will depend on your preferred service to use.
 
-One cheap option would be to use [Amazon SES](https://aws.amazon.com/ses/), with
-instructions on how to obtain credentials
-[here](https://docs.aws.amazon.com/ses/latest/dg/smtp-credentials.html).
+Various SMTP server options:
 
-If you know of other, better, simpler ways, feel free to add them here with a
-pull request.
+* [Sendinblue](https://www.sendinblue.com/) - Free 300 emails/day
+* [Mailjet](https://www.mailjet.com/) - Free 200 emails/day
+* [SendGrid](https://sendgrid.com) - Free 100 emails/day
+* [Amazon SES](https://aws.amazon.com/ses/)
 
 
 ### Test Your SMTP configuration

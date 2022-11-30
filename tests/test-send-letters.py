@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-import importlib
 import unittest
 
-
-sendletters = importlib.import_module('send-letters')
+from context import sendletters
 
 
 class EmailTests(unittest.TestCase):
