@@ -88,7 +88,7 @@ def send_letter(config, santa, dry_run):
         body=config['letter']['body'],
     )
 
-    with open(config['record_file'], 'a') as f:
+    with open(config['secret_santa_record_file'], 'a') as f:
         message = letter.get_email_message(santa)
         f.write(message)
         f.write('*' * 80 + '\n')
@@ -172,7 +172,7 @@ def send_secret_santa_emails(config, args):
     check_compatibilities(santas, config['incompatibles'])
 
     # Clear contents of the file
-    open(config['record_file'], 'w').close()
+    open(config['secret_santa_record_file'], 'w').close()
 
     while True:
         random.shuffle(santas)
@@ -192,7 +192,8 @@ def send_secret_santa_emails(config, args):
     for k in sorted(santas):
         send_letter(config, k, dry_run)
 
-    print('\nMail record saved to: {}'.format(config['record_file']))
+    print('\nMail record saved to: {}' \
+          .format(config['secret_santa_record_file']))
 
 
 def send_test_email(config, to_email):

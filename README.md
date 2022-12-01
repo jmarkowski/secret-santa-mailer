@@ -42,8 +42,9 @@ $ ./secret-santa-mailer.py
 
 This will read the configuration file and perform a "dry run" of the various
 pairings between secret Santas and recipients. It will generate an output file
-as specified by the `record_file` setting in `config.py` (by default
-it is `secret-santa-email-record.txt`).
+as specified by the `secret_santa_record_file` setting in `config.py`.
+
+This record file is saved as `secret-santa-record-file.txt` by default.
 
 
 ## 4. Configure the SMTP settings
@@ -77,8 +78,8 @@ emails.
 $ ./secret-santa-mailer.py --official
 ```
 
-This will send out the emails and record what emails it sent into the file
-specified by the `record_file` setting in `config.py`.
+This will dispatch the emails and record what emails it sent to the file
+specified by the `secret_santa_record_file` setting in `config.py`.
 
 *Don't look at the contents of this file, unless you want to know who everyone's
 secret Santa is.*
