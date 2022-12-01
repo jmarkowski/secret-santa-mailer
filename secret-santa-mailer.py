@@ -6,7 +6,7 @@ import smtplib
 from functools import total_ordering
 
 
-class SecretSantaError(Exception):
+class ConfigError(Exception):
     pass
 
 
@@ -130,8 +130,8 @@ def is_email_valid(email):
 def check_emails(santas):
     for santa in santas:
         if not is_email_valid(santa.email):
-            raise SecretSantaError(
-                    f'{santa.name} has an invalid email: {santa.email}')
+            raise ConfigError(
+                    f'{santa.name} has an invalid email: {santa.email}.')
 
 
 def check_compatibilities(santas, incompatibles):
@@ -139,26 +139,26 @@ def check_compatibilities(santas, incompatibles):
 
     for name in incompatibles:
         if name not in santa_names:
-            raise SecretSantaError(
+            raise ConfigError(
                     f'Unknown santa in incompatible list: {name}. ' \
-                     'Please check spelling')
+                     'Please check spelling.')
 
         for incompatible_recipient in incompatibles[name]:
             if incompatible_recipient not in santa_names:
-                raise SecretSantaError(
+                raise ConfigError(
                         f'Unknown incompatible recipient for {name}: ' \
                         f'{incompatible_recipient}. Please check spelling.')
 
 
         if not isinstance(incompatibles[name], tuple):
-            raise SecretSantaError(
-                    f'The incompatible list for {name} must be a tuple')
+            raise ConfigError(
+                    f'The incompatible list for {name} must be a tuple.')
 
         num_incompatible_recipients = len(incompatibles[name])
         num_possible_recipients = len(santas) - 1 - num_incompatible_recipients
 
         if num_possible_recipients == 0:
-            raise SecretSantaError(
+            raise ConfigError(
                     f'{name} has no option for a recipient! Check the ' \
                     '\'incompatibles\' list in the configuration file.')
 
@@ -215,8 +215,8 @@ def read_config(file_path):
         with open(file_path, mode='rb') as f:
             exec(compile(f.read(), file_path, 'exec'), config)
     except FileNotFoundError as e:
-        print(f'Configuration file ({config_path}) missing')
-        raise
+        raise ConfigError(
+                f'The configuration file "{file_path}" was not found.')
 
     return config
 
@@ -235,5 +235,5 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception as e:
-        print('Uh oh, something failed: {}'.format(e))
+    except ConfigError as e:
+        print(f'Configuration error:\n{e}')
