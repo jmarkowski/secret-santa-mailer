@@ -91,22 +91,6 @@ def is_santa_list_compatible(santas_lst, incompatibles):
     return True
 
 
-def send_letter(mailer, config, santa):
-    with open(config['secret_santa_record_file'], 'a') as f:
-        message = mailer.render_email_message(santa)
-        f.write(message)
-        f.write('*' * 80 + '\n')
-
-    mailer.send_email(santa)
-
-
-def set_recipients(santas):
-    for k in range(len(santas) - 1):
-        santas[k].recipient = santas[k+1]
-
-    santas[-1].recipient = santas[0]
-
-
 def is_email_valid(email):
     email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
 
@@ -149,33 +133,45 @@ def check_compatibilities(santas, incompatibles):
                     '\'incompatibles\' list in the configuration file.')
 
 
-def send_secret_santa_emails(mailer, config):
-    santas = list(map(lambda s: Santa(s[0], s[1]), config['santas'].items()))
-
-    check_emails(santas)
-    check_compatibilities(santas, config['incompatibles'])
-
-    # Clear contents of the file
-    open(config['secret_santa_record_file'], 'w').close()
-
-    while True:
-        random.shuffle(santas)
-
-        if is_santa_list_compatible(santas, config['incompatibles']):
-            break
-
-    set_recipients(santas)
-
+def send_secret_santa_emails(mailer, santas, record_file):
     if mailer.dry_run:
         print('>>> TESTING: Performing a sample dry-run ...')
     else:
         print('>>> Officially sending all secret santa emails ...\n')
 
-    for k in sorted(santas):
-        send_letter(mailer, config, k)
+    # Clear contents of the file
+    open(record_file, 'w').close()
 
-    print('\nMail record saved to: {}' \
-          .format(config['secret_santa_record_file']))
+    for santa in sorted(santas):
+        with open(record_file, 'a') as f:
+            message = mailer.render_email_message(santa)
+            f.write(message)
+            f.write('*' * 80 + '\n')
+
+        mailer.send_email(santa)
+
+    print(f'\nMail record saved to: {record_file}')
+
+
+def create_secret_santa_pairs(santa_dct, incompatibles):
+    santas = list(map(lambda s: Santa(s[0], s[1]), santa_dct.items()))
+
+    check_emails(santas)
+    check_compatibilities(santas, incompatibles)
+
+    while True:
+        random.shuffle(santas)
+
+        if is_santa_list_compatible(santas, incompatibles):
+            break
+
+    # Round-robin pairing of the randomly shuffled santas
+    for k in range(len(santas) - 1):
+        santas[k].recipient = santas[k+1]
+
+    santas[-1].recipient = santas[0]
+
+    return santas
 
 
 def send_test_email(mailer, to_email):
@@ -233,7 +229,10 @@ def main():
     if args.email:
         send_test_email(mailer, args.email)
     else:
-        send_secret_santa_emails(mailer, config)
+        santas = create_secret_santa_pairs(config['santas'],
+                                           config['incompatibles'])
+        send_secret_santa_emails(mailer, santas,
+                                 config['secret_santa_record_file'])
 
 
 if __name__ == '__main__':
