@@ -30,14 +30,14 @@ class Santa():
         return f'{self.name:12}'
 
 
-class Letter():
+class Mailer():
     def __init__(self, from_name, from_email, subject, body):
         self.from_name = from_name
         self.from_email = from_email
         self.subject = subject
         self.body = body
 
-    def get_email_message(self, santa):
+    def render_email_message(self, santa):
         message = \
             f'From: {self.from_name} <{self.from_email}>\n' \
             f'To: {santa.name} <{santa.email}>\n' \
@@ -51,7 +51,7 @@ class Letter():
 
     def send(self, santa, smtp_settings):
 
-        message = self.get_email_message(santa)
+        message = self.render_email_message(santa)
 
         try:
             server = smtplib.SMTP(smtp_settings['host'], smtp_settings['port'])
@@ -81,20 +81,20 @@ def is_santa_list_compatible(santas_lst, incompatibles):
 
 
 def send_letter(config, santa, dry_run):
-    letter = Letter(
-        from_name=config['letter']['from_name'],
-        from_email=config['letter']['from_email'],
-        subject=config['letter']['subject'],
-        body=config['letter']['body'],
+    mailer = Mailer(
+        from_name=config['email_template']['from_name'],
+        from_email=config['email_template']['from_email'],
+        subject=config['email_template']['subject'],
+        body=config['email_template']['body'],
     )
 
     with open(config['secret_santa_record_file'], 'a') as f:
-        message = letter.get_email_message(santa)
+        message = mailer.render_email_message(santa)
         f.write(message)
         f.write('*' * 80 + '\n')
 
     if not dry_run:
-        letter.send(santa, smtp_settings=config['smtp'])
+        mailer.send(santa, smtp_settings=config['smtp'])
 
 
 def set_recipients(santas):
@@ -181,14 +181,14 @@ def send_test_email(config, to_email):
     test_santa = Santa('Test Santa', to_email)
     test_santa.recipient = Santa('Test Recipient', None)
 
-    letter = Letter(
-        from_name=config['letter']['from_name'],
-        from_email=config['letter']['from_email'],
-        subject=config['letter']['subject'],
-        body=config['letter']['body'],
+    mailer = Mailer(
+        from_name=config['email_template']['from_name'],
+        from_email=config['email_template']['from_email'],
+        subject=config['email_template']['subject'],
+        body=config['email_template']['body'],
     )
 
-    letter.send(test_santa, smtp_settings=config['smtp'])
+    mailer.send(test_santa, smtp_settings=config['smtp'])
 
 
 def read_config(file_path):
