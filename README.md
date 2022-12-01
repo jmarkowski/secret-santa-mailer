@@ -1,7 +1,7 @@
-# Secret Santa
+# Secret Santa Mailer
 
-This secret santa script will automatically "pull from a hat" a recipient for
-each secret santa and send a notification email to each santa's inbox
+This python-based script will automatically "pull from a hat" a recipient for
+every secret santa and send a notification email to each santa's inbox
 of who their gift recipient is.
 
 It ensures that no one knows who their secret santa is... **not even you**! (That
@@ -37,7 +37,7 @@ In it, you must specify:
 ## 3. Perform a Dry Run
 
 ```
-$ ./send-letters.py
+$ ./secret-santa-mailer.py
 ```
 
 This will read the configuration file and perform a "dry run" of the various
@@ -64,7 +64,7 @@ Various SMTP server options are available. A few popular options include:
 Send a test email to confirm that the SMTP configuration is set up correctly:
 
 ```
-$ ./send-letters.py --send-test-email you@example.com
+$ ./secret-santa-mailer.py --send-test-email you@example.com
 ```
 
 If it runs without any errors, then you're ready to send the secret Santa
@@ -74,14 +74,14 @@ emails.
 ## 5. Send the emails!
 
 ```
-$ ./send-letters.py --official
+$ ./secret-santa-mailer.py --official
 ```
 
 This will send out the emails and record what emails it sent into the file
 specified by the `record_file` setting in `config.py`.
 
 *Don't look at the contents of this file, unless you want to know who everyone's
-secret Santa is!*
+secret Santa is.*
 
 It will sequentially send emails to everyone.
 
