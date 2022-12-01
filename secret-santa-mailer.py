@@ -11,7 +11,7 @@ class ConfigError(Exception):
 
 
 @total_ordering
-class Santa(object):
+class Santa():
     def __init__(self, name, email):
         self.name = name
         self.email = email
@@ -24,7 +24,7 @@ class Santa(object):
         return self.name.lower() < other.name.lower()
 
     def __str__(self):
-        if isinstance(self.recipient, Santa):
+        if self.recipient:
             return f'{self.name:12} -> {self.recipient.name}'
 
         return f'{self.name:12}'
