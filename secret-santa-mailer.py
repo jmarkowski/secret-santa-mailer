@@ -21,7 +21,6 @@ class Santa(object):
         return self.name.lower() == other.name.lower()
 
     def __lt__(self, other):
-        assert isinstance(other, Santa)
         return self.name.lower() < other.name.lower()
 
     def __str__(self):
@@ -98,7 +97,6 @@ def send_letter(config, santa, dry_run):
 
 
 def set_recipients(santas):
-
     for k in range(len(santas) - 1):
         santas[k].recipient = santas[k+1]
 
