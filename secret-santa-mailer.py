@@ -37,14 +37,12 @@ class Mailer():
             subject,
             body,
             smtp_settings,
-            dry_run=False,
         ):
         self.from_name = from_name
         self.from_email = from_email
         self.subject = subject
         self.body = body
         self.smtp = smtp_settings
-        self.dry_run = dry_run
 
     def render_email_message(self, santa):
         message = \
@@ -60,9 +58,6 @@ class Mailer():
 
     def send_email(self, santa):
         message = self.render_email_message(santa)
-
-        if self.dry_run:
-            return
 
         try:
             server = smtplib.SMTP(self.smtp['host'], self.smtp['port'])
@@ -133,8 +128,8 @@ def check_compatibilities(santas, incompatibles):
                     '\'incompatibles\' list in the configuration file.')
 
 
-def send_secret_santa_emails(mailer, santas, record_file):
-    if mailer.dry_run:
+def send_secret_santa_emails(mailer, santas, record_file, dry_run):
+    if dry_run:
         print('>>> TESTING: Performing a sample dry-run ...')
     else:
         print('>>> Officially sending all secret santa emails ...\n')
@@ -148,7 +143,8 @@ def send_secret_santa_emails(mailer, santas, record_file):
             f.write(message)
             f.write('*' * 80 + '\n')
 
-        mailer.send_email(santa)
+        if not dry_run:
+            mailer.send_email(santa)
 
     print(f'\nMail record saved to: {record_file}')
 
@@ -223,16 +219,18 @@ def main():
         subject=config['email_template']['subject'],
         body=config['email_template']['body'],
         smtp_settings=config['smtp'],
-        dry_run=(not args.official and not args.email),
     )
 
     if args.email:
         send_test_email(mailer, args.email)
     else:
+        dry_run = not args.official
+
         santas = create_secret_santa_pairs(config['santas'],
                                            config['incompatibles'])
         send_secret_santa_emails(mailer, santas,
-                                 config['secret_santa_record_file'])
+                                 config['secret_santa_record_file'],
+                                 dry_run)
 
 
 if __name__ == '__main__':
