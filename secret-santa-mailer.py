@@ -37,12 +37,14 @@ class Mailer():
             subject,
             body,
             smtp_settings,
+            dry_run=False,
         ):
         self.from_name = from_name
         self.from_email = from_email
         self.subject = subject
         self.body = body
         self.smtp = smtp_settings
+        self.dry_run = dry_run
 
     def render_email_message(self, santa):
         message = \
@@ -58,6 +60,9 @@ class Mailer():
 
     def send_email(self, santa):
         message = self.render_email_message(santa)
+
+        if self.dry_run:
+            return
 
         try:
             server = smtplib.SMTP(self.smtp['host'], self.smtp['port'])
@@ -86,14 +91,13 @@ def is_santa_list_compatible(santas_lst, incompatibles):
     return True
 
 
-def send_letter(mailer, config, santa, dry_run):
+def send_letter(mailer, config, santa):
     with open(config['secret_santa_record_file'], 'a') as f:
         message = mailer.render_email_message(santa)
         f.write(message)
         f.write('*' * 80 + '\n')
 
-    if not dry_run:
-        mailer.send_email(santa)
+    mailer.send_email(santa)
 
 
 def set_recipients(santas):
@@ -145,7 +149,7 @@ def check_compatibilities(santas, incompatibles):
                     '\'incompatibles\' list in the configuration file.')
 
 
-def send_secret_santa_emails(mailer, config, args):
+def send_secret_santa_emails(mailer, config):
     santas = list(map(lambda s: Santa(s[0], s[1]), config['santas'].items()))
 
     check_emails(santas)
@@ -162,15 +166,13 @@ def send_secret_santa_emails(mailer, config, args):
 
     set_recipients(santas)
 
-    dry_run = not args.official
-
-    if dry_run:
+    if mailer.dry_run:
         print('>>> TESTING: Performing a sample dry-run ...')
     else:
         print('>>> Officially sending all secret santa emails ...\n')
 
     for k in sorted(santas):
-        send_letter(mailer, config, k, dry_run)
+        send_letter(mailer, config, k)
 
     print('\nMail record saved to: {}' \
           .format(config['secret_santa_record_file']))
@@ -225,12 +227,13 @@ def main():
         subject=config['email_template']['subject'],
         body=config['email_template']['body'],
         smtp_settings=config['smtp'],
+        dry_run=(not args.official and not args.email),
     )
 
     if args.email:
         send_test_email(mailer, args.email)
     else:
-        send_secret_santa_emails(mailer, config, args)
+        send_secret_santa_emails(mailer, config)
 
 
 if __name__ == '__main__':
