@@ -103,24 +103,6 @@ def set_recipients(santas):
     santas[-1].recipient = santas[0]
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-              description='Auto-send Secret Santa letters!')
-
-    parser.add_argument('--official',
-        dest='official',
-        action='store_true',
-        help='Actually send the secret santa emails (for real!)')
-
-    parser.add_argument('--send-test-email',
-        dest='email',
-        type=str,
-        help='Send a test email to EMAIL to check if SMTP settings ' \
-                'are correctly configured')
-
-    return parser.parse_args()
-
-
 def is_email_valid(email):
     email_regex = r'[^@\s]+@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9]+)+$'
 
@@ -219,6 +201,24 @@ def read_config(file_path):
                 f'The configuration file "{file_path}" was not found.')
 
     return config
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+              description='Secret Santa Mailer')
+
+    parser.add_argument('--official',
+        dest='official',
+        action='store_true',
+        help='Officially send out all the secret santa emails')
+
+    parser.add_argument('--send-test-email',
+        dest='email',
+        type=str,
+        help='Send a test email to EMAIL to check if SMTP settings ' \
+                'are correctly configured')
+
+    return parser.parse_args()
 
 
 def main():
