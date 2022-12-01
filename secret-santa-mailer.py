@@ -60,9 +60,10 @@ class Letter():
             server.sendmail(self.from_email, [santa.email], message.encode('utf-8'))
             server.close()
 
-            print('Successfully mailed letter to {}!'.format(santa.name))
+            print(f'Successfully mailed letter: {santa.name} ({santa.email})')
         except Exception as e:
-            print('Error: Failed to mail letter: {}'.format(e))
+            print(f'Failed to mail letter: {e}\n' \
+                    '(Verify that the SMTP settings are correct.)')
 
 
 def is_santa_list_compatible(santas_lst, incompatibles):
