@@ -14,7 +14,7 @@ smtp = {
 # Note that {santa} and {recipient} are automatically replaced by the secret
 # santa's name, and his/her recipient of their gift.
 ################################################################################
-letter = {
+email_template = {
     'from_name': 'Secret Santa',
     'from_email': smtp['from_email'],
     'subject': 'Family Christmas',

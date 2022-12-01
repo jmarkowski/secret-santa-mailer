@@ -11,7 +11,7 @@ class ConfigError(Exception):
 
 
 @total_ordering
-class Santa(object):
+class Santa():
     def __init__(self, name, email):
         self.name = name
         self.email = email
@@ -24,20 +24,27 @@ class Santa(object):
         return self.name.lower() < other.name.lower()
 
     def __str__(self):
-        if isinstance(self.recipient, Santa):
+        if self.recipient:
             return f'{self.name:12} -> {self.recipient.name}'
 
         return f'{self.name:12}'
 
 
-class Letter():
-    def __init__(self, from_name, from_email, subject, body):
+class Mailer():
+    def __init__(self,
+            from_name,
+            from_email,
+            subject,
+            body,
+            smtp_settings,
+        ):
         self.from_name = from_name
         self.from_email = from_email
         self.subject = subject
         self.body = body
+        self.smtp = smtp_settings
 
-    def get_email_message(self, santa):
+    def render_email_message(self, santa):
         message = \
             f'From: {self.from_name} <{self.from_email}>\n' \
             f'To: {santa.name} <{santa.email}>\n' \
@@ -49,14 +56,13 @@ class Letter():
 
         return message
 
-    def send(self, santa, smtp_settings):
-
-        message = self.get_email_message(santa)
+    def send_email(self, santa):
+        message = self.render_email_message(santa)
 
         try:
-            server = smtplib.SMTP(smtp_settings['host'], smtp_settings['port'])
+            server = smtplib.SMTP(self.smtp['host'], self.smtp['port'])
             server.starttls()
-            server.login(smtp_settings['username'], smtp_settings['password'])
+            server.login(self.smtp['username'], self.smtp['password'])
             server.sendmail(self.from_email, [santa.email], message.encode('utf-8'))
             server.close()
 
@@ -78,30 +84,6 @@ def is_santa_list_compatible(santas_lst, incompatibles):
             return False
 
     return True
-
-
-def send_letter(config, santa, dry_run):
-    letter = Letter(
-        from_name=config['letter']['from_name'],
-        from_email=config['letter']['from_email'],
-        subject=config['letter']['subject'],
-        body=config['letter']['body'],
-    )
-
-    with open(config['secret_santa_record_file'], 'a') as f:
-        message = letter.get_email_message(santa)
-        f.write(message)
-        f.write('*' * 80 + '\n')
-
-    if not dry_run:
-        letter.send(santa, smtp_settings=config['smtp'])
-
-
-def set_recipients(santas):
-    for k in range(len(santas) - 1):
-        santas[k].recipient = santas[k+1]
-
-    santas[-1].recipient = santas[0]
 
 
 def is_email_valid(email):
@@ -146,49 +128,53 @@ def check_compatibilities(santas, incompatibles):
                     '\'incompatibles\' list in the configuration file.')
 
 
-def send_secret_santa_emails(config, args):
-    santas = list(map(lambda s: Santa(s[0], s[1]), config['santas'].items()))
-
-    check_emails(santas)
-    check_compatibilities(santas, config['incompatibles'])
-
-    # Clear contents of the file
-    open(config['secret_santa_record_file'], 'w').close()
-
-    while True:
-        random.shuffle(santas)
-
-        if is_santa_list_compatible(santas, config['incompatibles']):
-            break
-
-    set_recipients(santas)
-
-    dry_run = not args.official
-
+def send_secret_santa_emails(mailer, santas, record_file, dry_run):
     if dry_run:
         print('>>> TESTING: Performing a sample dry-run ...')
     else:
         print('>>> Officially sending all secret santa emails ...\n')
 
-    for k in sorted(santas):
-        send_letter(config, k, dry_run)
+    # Clear contents of the file
+    open(record_file, 'w').close()
 
-    print('\nMail record saved to: {}' \
-          .format(config['secret_santa_record_file']))
+    for santa in sorted(santas):
+        with open(record_file, 'a') as f:
+            message = mailer.render_email_message(santa)
+            f.write(message)
+            f.write('*' * 80 + '\n')
+
+        if not dry_run:
+            mailer.send_email(santa)
+
+    print(f'\nMail record saved to: {record_file}')
 
 
-def send_test_email(config, to_email):
+def create_secret_santa_pairs(santa_dct, incompatibles):
+    santas = list(map(lambda s: Santa(s[0], s[1]), santa_dct.items()))
+
+    check_emails(santas)
+    check_compatibilities(santas, incompatibles)
+
+    while True:
+        random.shuffle(santas)
+
+        if is_santa_list_compatible(santas, incompatibles):
+            break
+
+    # Round-robin pairing of the randomly shuffled santas
+    for k in range(len(santas) - 1):
+        santas[k].recipient = santas[k+1]
+
+    santas[-1].recipient = santas[0]
+
+    return santas
+
+
+def send_test_email(mailer, to_email):
     test_santa = Santa('Test Santa', to_email)
     test_santa.recipient = Santa('Test Recipient', None)
 
-    letter = Letter(
-        from_name=config['letter']['from_name'],
-        from_email=config['letter']['from_email'],
-        subject=config['letter']['subject'],
-        body=config['letter']['body'],
-    )
-
-    letter.send(test_santa, smtp_settings=config['smtp'])
+    mailer.send_email(test_santa)
 
 
 def read_config(file_path):
@@ -227,10 +213,24 @@ def main():
 
     config = read_config('config.py')
 
+    mailer = Mailer(
+        from_name=config['email_template']['from_name'],
+        from_email=config['email_template']['from_email'],
+        subject=config['email_template']['subject'],
+        body=config['email_template']['body'],
+        smtp_settings=config['smtp'],
+    )
+
     if args.email:
-        send_test_email(config, args.email)
+        send_test_email(mailer, args.email)
     else:
-        send_secret_santa_emails(config, args)
+        dry_run = not args.official
+
+        santas = create_secret_santa_pairs(config['santas'],
+                                           config['incompatibles'])
+        send_secret_santa_emails(mailer, santas,
+                                 config['secret_santa_record_file'],
+                                 dry_run)
 
 
 if __name__ == '__main__':
