@@ -2,13 +2,68 @@
 import argparse
 import random
 import re
+import smtplib
+from functools import total_ordering
 
-from santa import Santa
-from letter import Letter
 
-
-class SecretSantaError(Exception):
+class ConfigError(Exception):
     pass
+
+
+@total_ordering
+class Santa(object):
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        self.recipient = None
+
+    def __eq__(self, other):
+        return self.name.lower() == other.name.lower()
+
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()
+
+    def __str__(self):
+        if isinstance(self.recipient, Santa):
+            return f'{self.name:12} -> {self.recipient.name}'
+
+        return f'{self.name:12}'
+
+
+class Letter():
+    def __init__(self, from_name, from_email, subject, body):
+        self.from_name = from_name
+        self.from_email = from_email
+        self.subject = subject
+        self.body = body
+
+    def get_email_message(self, santa):
+        message = \
+            f'From: {self.from_name} <{self.from_email}>\n' \
+            f'To: {santa.name} <{santa.email}>\n' \
+            f'Subject: {self.subject}\n\n' \
+            f'{self.body}\n'
+
+        message = message.replace('{santa}', santa.name)
+        message = message.replace('{recipient}', santa.recipient.name)
+
+        return message
+
+    def send(self, santa, smtp_settings):
+
+        message = self.get_email_message(santa)
+
+        try:
+            server = smtplib.SMTP(smtp_settings['host'], smtp_settings['port'])
+            server.starttls()
+            server.login(smtp_settings['username'], smtp_settings['password'])
+            server.sendmail(self.from_email, [santa.email], message.encode('utf-8'))
+            server.close()
+
+            print(f'Successfully mailed letter: {santa.name} ({santa.email})')
+        except Exception as e:
+            print(f'Failed to mail letter: {e}\n' \
+                    '(Verify that the SMTP settings are correct.)')
 
 
 def is_santa_list_compatible(santas_lst, incompatibles):
@@ -33,7 +88,7 @@ def send_letter(config, santa, dry_run):
         body=config['letter']['body'],
     )
 
-    with open(config['record_file'], 'a') as f:
+    with open(config['secret_santa_record_file'], 'a') as f:
         message = letter.get_email_message(santa)
         f.write(message)
         f.write('*' * 80 + '\n')
@@ -43,29 +98,10 @@ def send_letter(config, santa, dry_run):
 
 
 def set_recipients(santas):
-
     for k in range(len(santas) - 1):
         santas[k].recipient = santas[k+1]
 
     santas[-1].recipient = santas[0]
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-              description='Auto-send Secret Santa letters!')
-
-    parser.add_argument('--official',
-        dest='official',
-        action='store_true',
-        help='Actually send the secret santa emails (for real!)')
-
-    parser.add_argument('--send-test-email',
-        dest='email',
-        type=str,
-        help='Send a test email to EMAIL to check if SMTP settings ' \
-                'are correctly configured')
-
-    return parser.parse_args()
 
 
 def is_email_valid(email):
@@ -77,8 +113,8 @@ def is_email_valid(email):
 def check_emails(santas):
     for santa in santas:
         if not is_email_valid(santa.email):
-            raise SecretSantaError(
-                    f'{santa.name} has an invalid email: {santa.email}')
+            raise ConfigError(
+                    f'{santa.name} has an invalid email: {santa.email}.')
 
 
 def check_compatibilities(santas, incompatibles):
@@ -86,26 +122,26 @@ def check_compatibilities(santas, incompatibles):
 
     for name in incompatibles:
         if name not in santa_names:
-            raise SecretSantaError(
+            raise ConfigError(
                     f'Unknown santa in incompatible list: {name}. ' \
-                     'Please check spelling')
+                     'Please check spelling.')
 
         for incompatible_recipient in incompatibles[name]:
             if incompatible_recipient not in santa_names:
-                raise SecretSantaError(
+                raise ConfigError(
                         f'Unknown incompatible recipient for {name}: ' \
                         f'{incompatible_recipient}. Please check spelling.')
 
 
         if not isinstance(incompatibles[name], tuple):
-            raise SecretSantaError(
-                    f'The incompatible list for {name} must be a tuple')
+            raise ConfigError(
+                    f'The incompatible list for {name} must be a tuple.')
 
         num_incompatible_recipients = len(incompatibles[name])
         num_possible_recipients = len(santas) - 1 - num_incompatible_recipients
 
         if num_possible_recipients == 0:
-            raise SecretSantaError(
+            raise ConfigError(
                     f'{name} has no option for a recipient! Check the ' \
                     '\'incompatibles\' list in the configuration file.')
 
@@ -117,7 +153,7 @@ def send_secret_santa_emails(config, args):
     check_compatibilities(santas, config['incompatibles'])
 
     # Clear contents of the file
-    open(config['record_file'], 'w').close()
+    open(config['secret_santa_record_file'], 'w').close()
 
     while True:
         random.shuffle(santas)
@@ -137,7 +173,8 @@ def send_secret_santa_emails(config, args):
     for k in sorted(santas):
         send_letter(config, k, dry_run)
 
-    print('\nMail record saved to: {}'.format(config['record_file']))
+    print('\nMail record saved to: {}' \
+          .format(config['secret_santa_record_file']))
 
 
 def send_test_email(config, to_email):
@@ -161,10 +198,28 @@ def read_config(file_path):
         with open(file_path, mode='rb') as f:
             exec(compile(f.read(), file_path, 'exec'), config)
     except FileNotFoundError as e:
-        print(f'Configuration file ({config_path}) missing')
-        raise
+        raise ConfigError(
+                f'The configuration file "{file_path}" was not found.')
 
     return config
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+              description='Secret Santa Mailer')
+
+    parser.add_argument('--official',
+        dest='official',
+        action='store_true',
+        help='Officially send out all the secret santa emails')
+
+    parser.add_argument('--send-test-email',
+        dest='email',
+        type=str,
+        help='Send a test email to EMAIL to check if SMTP settings ' \
+                'are correctly configured')
+
+    return parser.parse_args()
 
 
 def main():
@@ -181,5 +236,5 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception as e:
-        print('Uh oh, something failed: {}'.format(e))
+    except ConfigError as e:
+        print(f'Configuration error:\n{e}')
