@@ -1,46 +1,45 @@
-from letter import Letter
-from santa import Santa
-
 ################################################################################
 # SMTP configuration settings.
 ################################################################################
-smtp_user = 'username'
-smtp_pass = 'password'
-smtp_host = 'email-smtp.example.com'
-smtp_port = 587
-from_email = 'email-used-to-send-letters@example.com'
+smtp = {
+    'username': 'username',
+    'password': 'password',
+    'host': 'email-smtp.example.com',
+    'port': 587,
+    'from_email': 'email-used-to-send-letters@example.com',
+}
 
 ################################################################################
 # This the secret santa letter template that is used to send everyone the email.
 # Note that {santa} and {recipient} are automatically replaced by the secret
 # santa's name, and his/her recipient of their gift.
 ################################################################################
-letter = Letter(
-    from_name='Secret Santa',
-    from_email=from_email,
-    subject='Family Christmas',
-    body="""
+letter = {
+    'from_name': 'Secret Santa',
+    'from_email': smtp['from_email'],
+    'subject': 'Family Christmas',
+    'body': """
 Ho Ho Ho!
 
 {santa}, you are {recipient}'s secret Santa!
 
 Merry Christmas!
 """
-)
+}
 
 ################################################################################
 # The complete list of all the secret santa's and their email addresses.
 ################################################################################
-santas = [
-    Santa('James',      'james@example.com'),
-    Santa('Mary',       'mary@example.com'),
-    Santa('Nancy',      'nancy@example.com'),
-    Santa('John',       'john@example.com'),
-    Santa('Michael',    'michael@example.com'),
-    Santa('Lisa',       'lisa@example.com'),
-    Santa('David',      'david@example.com'),
-    Santa('Linda',      'linda@example.com'),
-]
+santas = {
+    'James': 'james@example.com',
+    'Mary': 'mary@example.com',
+    'Nancy': 'nancy@example.com',
+    'John': 'john@example.com',
+    'Michael': 'michael@example.com',
+    'Lisa': 'lisa@example.com',
+    'David': 'david@example.com',
+    'Linda': 'linda@example.com',
+}
 
 ################################################################################
 # This contains a dictionary lookup of santa's (keys) who are not allowed to

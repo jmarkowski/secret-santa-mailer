@@ -1,6 +1,5 @@
 import smtplib
 
-import config
 from santa import Santa
 
 
@@ -23,14 +22,14 @@ class Letter(object):
 
         return message
 
-    def send(self, santa):
+    def send(self, santa, smtp_settings):
 
         message = self.get_email_message(santa)
 
         try:
-            server = smtplib.SMTP(config.smtp_host, config.smtp_port)
+            server = smtplib.SMTP(smtp_settings['host'], smtp_settings['port'])
             server.starttls()
-            server.login(config.smtp_user, config.smtp_pass)
+            server.login(smtp_settings['username'], smtp_settings['password'])
             server.sendmail(self.from_email, [santa.email], message.encode('utf-8'))
             server.close()
 

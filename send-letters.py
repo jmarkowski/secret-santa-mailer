@@ -3,37 +3,43 @@ import argparse
 import random
 import re
 
-import config
 from santa import Santa
+from letter import Letter
 
 
 class SecretSantaError(Exception):
     pass
 
 
-def is_santa_list_compatible(santas_lst):
+def is_santa_list_compatible(santas_lst, incompatibles):
     for k in range(len(santas_lst)):
         a = k % len(santas_lst)
         b = (k + 1) % len(santas_lst)
 
         santa, recipient = santas_lst[a].name, santas_lst[b].name
 
-        if santa in config.incompatibles and \
-                recipient in config.incompatibles[santa]:
+        if santa in incompatibles and \
+                recipient in incompatibles[santa]:
             return False
 
     return True
 
 
-def send_letter(santa, dry_run):
-    message = config.letter.get_email_message(santa)
+def send_letter(config, santa, dry_run):
+    letter = Letter(
+        from_name=config['letter']['from_name'],
+        from_email=config['letter']['from_email'],
+        subject=config['letter']['subject'],
+        body=config['letter']['body'],
+    )
 
-    with open(config.record_file, 'a') as f:
+    with open(config['record_file'], 'a') as f:
+        message = letter.get_email_message(santa)
         f.write(message)
         f.write('*' * 80 + '\n')
 
     if not dry_run:
-        config.letter.send(santa)
+        letter.send(santa, smtp_settings=config['smtp'])
 
 
 def set_recipients(santas):
@@ -75,27 +81,27 @@ def check_emails(santas):
                     f'{santa.name} has an invalid email: {santa.email}')
 
 
-def check_compatibilities(santas):
+def check_compatibilities(santas, incompatibles):
     santa_names = tuple(map(lambda s: s.name, santas))
 
-    for name in config.incompatibles:
+    for name in incompatibles:
         if name not in santa_names:
             raise SecretSantaError(
                     f'Unknown santa in incompatible list: {name}. ' \
                      'Please check spelling')
 
-        for incompatible_recipient in config.incompatibles[name]:
+        for incompatible_recipient in incompatibles[name]:
             if incompatible_recipient not in santa_names:
                 raise SecretSantaError(
                         f'Unknown incompatible recipient for {name}: ' \
                         f'{incompatible_recipient}. Please check spelling.')
 
 
-        if not isinstance(config.incompatibles[name], tuple):
+        if not isinstance(incompatibles[name], tuple):
             raise SecretSantaError(
                     f'The incompatible list for {name} must be a tuple')
 
-        num_incompatible_recipients = len(config.incompatibles[name])
+        num_incompatible_recipients = len(incompatibles[name])
         num_possible_recipients = len(santas) - 1 - num_incompatible_recipients
 
         if num_possible_recipients == 0:
@@ -104,19 +110,19 @@ def check_compatibilities(santas):
                     '\'incompatibles\' list in the configuration file.')
 
 
-def send_secret_santa_emails(args):
-    santas = config.santas
+def send_secret_santa_emails(config, args):
+    santas = list(map(lambda s: Santa(s[0], s[1]), config['santas'].items()))
 
     check_emails(santas)
-    check_compatibilities(santas)
+    check_compatibilities(santas, config['incompatibles'])
 
     # Clear contents of the file
-    open(config.record_file, 'w').close()
+    open(config['record_file'], 'w').close()
 
     while True:
         random.shuffle(santas)
 
-        if is_santa_list_compatible(santas):
+        if is_santa_list_compatible(santas, config['incompatibles']):
             break
 
     set_recipients(santas)
@@ -129,24 +135,47 @@ def send_secret_santa_emails(args):
         print('>>> Officially sending all secret santa emails ...\n')
 
     for k in sorted(santas):
-        send_letter(k, dry_run)
+        send_letter(config, k, dry_run)
 
-    print('\nMail record saved to: {}'.format(config.record_file))
+    print('\nMail record saved to: {}'.format(config['record_file']))
 
 
-def send_test_email(to_email):
+def send_test_email(config, to_email):
     test_santa = Santa('Test Santa', to_email)
     test_santa.recipient = Santa('Test Recipient', None)
-    config.letter.send(test_santa)
+
+    letter = Letter(
+        from_name=config['letter']['from_name'],
+        from_email=config['letter']['from_email'],
+        subject=config['letter']['subject'],
+        body=config['letter']['body'],
+    )
+
+    letter.send(test_santa, smtp_settings=config['smtp'])
+
+
+def read_config(file_path):
+    config = dict()
+
+    try:
+        with open(file_path, mode='rb') as f:
+            exec(compile(f.read(), file_path, 'exec'), config)
+    except FileNotFoundError as e:
+        print(f'Configuration file ({config_path}) missing')
+        raise
+
+    return config
 
 
 def main():
     args = parse_arguments()
 
+    config = read_config('config.py')
+
     if args.email:
-        send_test_email(args.email)
+        send_test_email(config, args.email)
     else:
-        send_secret_santa_emails(args)
+        send_secret_santa_emails(config, args)
 
 
 if __name__ == '__main__':

@@ -29,12 +29,12 @@ Make your desired modifications to the `config.py` configuration file.
 In it, you must specify:
 
 *  The SMTP settings as specified by your SMTP host.
-*  The list of secret santas.
 *  An email template.
+*  The list of secret santas.
 *  Optionally a lookup of anyone who should not be someone elses santa.
 
 
-## 3. Test the Script
+## 3. Perform a Dry Run
 
 ```
 $ ./send-letters.py
@@ -51,7 +51,7 @@ it is `secret-santa-email-record.txt`).
 This script relies on a simple SMTP method of sending emails, and the SMTP
 settings in `config.py` will depend on your preferred service to use.
 
-Various SMTP server options:
+Various SMTP server options are available. A few popular options include:
 
 * [Sendinblue](https://www.sendinblue.com/) - Free 300 emails/day
 * [Mailjet](https://www.mailjet.com/) - Free 200 emails/day
